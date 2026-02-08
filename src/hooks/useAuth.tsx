@@ -4,8 +4,9 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { User, AuthState } from '@/types/task.types'
 import { AuthResponse, SignUpCredentials, SignInCredentials } from '@/types/auth.types'
 import { authService } from '@/services/auth-service'
+import { isTokenExpired, getToken, clearAuthData, getUser } from '@/utils/auth'
 
-interface AuthContextType {
+export interface AuthContextType {
   authState: AuthState
   signUp: (credentials: SignUpCredentials) => Promise<AuthResponse>
   signIn: (credentials: SignInCredentials) => Promise<AuthResponse>
@@ -42,7 +43,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // Set up token expiration check interval (check every minute)
     const interval = setInterval(() => {
-      if (authState.isAuthenticated && authService.isTokenExpired()) {
+      const token = getToken()
+      if (authState.isAuthenticated && token && isTokenExpired(token)) {
         // Token has expired, automatically log out the user
         handleTokenExpiration();
       }
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const handleTokenExpiration = () => {
     // Token expired, clear token and update state
-    authService.clearToken();
+    clearAuthData();
 
     setAuthState({
       user: null,
@@ -68,8 +70,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const checkAuthStatus = () => {
     // Check if user is authenticated using enhanced auth service
     if (authService.isAuthenticated()) {
-      const user = authService.getCurrentUser();
-      const token = localStorage.getItem('jwt_token');
+      const user = getUser();
+      const token = getToken();
 
       setAuthState({
         user: user,
@@ -82,7 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Token is expired or doesn't exist
       if (localStorage.getItem('jwt_token')) {
         // Token exists but is expired, remove it
-        authService.clearToken();
+        clearAuthData();
       }
 
       setAuthState({
@@ -99,12 +101,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
-      const result = await authService.signUp(credentials);
+      const result = await authService.signup(credentials);
 
       if (result.success) {
         // Get updated user info after successful sign up
-        const user = authService.getCurrentUser();
-        const token = localStorage.getItem('jwt_token');
+        const user = getUser();
+        const token = getToken();
 
         setAuthState({
           user: user,
@@ -140,12 +142,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
-      const result = await authService.signIn(credentials);
+      const result = await authService.signin(credentials);
 
       if (result.success) {
         // Get updated user info after successful sign in
-        const user = authService.getCurrentUser();
-        const token = localStorage.getItem('jwt_token');
+        const user = getUser();
+        const token = getToken();
 
         setAuthState({
           user: user,
@@ -179,7 +181,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async (): Promise<void> => {
     try {
-      await authService.signOut();
+      await authService.signout();
 
       setAuthState({
         user: null,
@@ -190,7 +192,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
     } catch (error) {
       // Even if the API call fails, clear local state
-      authService.clearToken();
+      clearAuthData();
 
       setAuthState({
         user: null,

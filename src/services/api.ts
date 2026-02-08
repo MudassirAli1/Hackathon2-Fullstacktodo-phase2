@@ -17,10 +17,15 @@ class ApiService {
     const token = getToken();
 
     // Set up default headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
     };
+
+    // Merge custom headers if provided
+    if (options.headers && typeof options.headers === 'object') {
+      const customHeaders = options.headers as Record<string, string>;
+      Object.assign(headers, customHeaders);
+    }
 
     // Add authorization header if token exists
     if (token) {

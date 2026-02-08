@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
 
 class ApiClient {
   private axiosInstance: AxiosInstance;
@@ -14,16 +14,10 @@ class ApiClient {
 
     // Request interceptor to add JWT token
     this.axiosInstance.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
+      (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem('jwt_token');
         if (token) {
-          if (config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-          } else {
-            config.headers = {
-              Authorization: `Bearer ${token}`,
-            };
-          }
+          config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },

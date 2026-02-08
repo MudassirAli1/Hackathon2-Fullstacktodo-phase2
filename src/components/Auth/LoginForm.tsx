@@ -12,7 +12,7 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { signin } = useAuth();
+  const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
     setError(null);
 
     try {
-      const result = await signin(email, password);
+      const result = await signIn({ email, password });
 
       if (result.success) {
         // Redirect to dashboard after successful sign in
