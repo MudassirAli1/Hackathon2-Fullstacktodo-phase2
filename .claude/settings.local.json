@@ -1,7 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs ls:*)"
+      "Bash(git fetch:*)",
+      "Bash(dir:*)",
+      "Bash(powershell -Command \".specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName ''frontend-ui-layer'' -Description ''Frontend & UI Layer''\")",
+      "Bash(powershell -Command \".specify/scripts/powershell/setup-plan.ps1 -Json\":*)",
+      "Bash(powershell -Command:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run dev)",
+      "Bash(pip install:*)",
+      "Bash(python -m uvicorn:*)",
+      "Bash(del \"F:\\\\Hackathon2-q4\\\\phase-2\\\\backend\\\\src\\\\config.py\")",
+      "Bash(find . -name \"*.py\" -exec grep -l \"\\\\.better_auth_secret\\\\|\\\\.database_url\\\\|\\\\.jwt_\" {} ;:*)",
+      "Bash(test:*)",
+      "Bash(ls -la frontend/src/app/\\\\\\(auth\\\\\\)/)",
+      "Bash(python:*)",
+      "Bash(timeout:*)",
+      "Bash(netstat:*)",
+      "Bash(curl -X GET http://localhost:8001/health)",
+      "Bash(curl:*)",
+      "Bash(uvicorn:*)"
     ]
   }
 }
